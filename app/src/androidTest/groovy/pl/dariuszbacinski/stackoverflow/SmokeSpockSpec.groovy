@@ -7,7 +7,7 @@ import spock.lang.Specification
 public class SmokeSpockSpec extends Specification {
 
     @Rule
-    ActivityTestRule<SearchActivity> locationActivityRule = new ActivityTestRule(SearchActivity)
+    ActivityTestRule<SearchActivity> searchActivityActivityTestRule = new ActivityTestRule(SearchActivity)
 
     def 'always pass'() {
         expect:
