@@ -8,3 +8,5 @@ android:
     - extra-android-m2repository
 jdk:
     - oraclejdk8
+script:
+    - ./gradlew build test
