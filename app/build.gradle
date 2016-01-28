@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 
 apply plugin: 'groovyx.grooid.groovy-android'
+apply plugin: 'com.jakewharton.hugo'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -24,6 +26,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    dataBinding {
+        enabled = true
+    }
     packagingOptions {
         exclude 'META-INF/services/org.codehaus.groovy.transform.ASTTransformation'
         exclude 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule'
@@ -35,6 +40,13 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'io.reactivex:rxjava:1.1.0'
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-support-v4:0.3.0'
 
     testCompile 'org.robospock:robospock:1.0.0'
 
