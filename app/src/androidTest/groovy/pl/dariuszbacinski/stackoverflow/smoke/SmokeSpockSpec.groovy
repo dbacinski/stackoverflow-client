@@ -2,7 +2,7 @@ package pl.dariuszbacinski.stackoverflow.smoke
 
 import android.support.test.rule.ActivityTestRule
 import org.junit.Rule
-import pl.dariuszbacinski.stackoverflow.search.SearchActivity
+import pl.dariuszbacinski.stackoverflow.search.view.SearchActivity
 import spock.lang.Specification
 
 public class SmokeSpockSpec extends Specification {

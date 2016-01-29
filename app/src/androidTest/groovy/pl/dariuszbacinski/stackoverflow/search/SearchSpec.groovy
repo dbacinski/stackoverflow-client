@@ -3,6 +3,7 @@ package pl.dariuszbacinski.stackoverflow.search
 import android.support.test.rule.ActivityTestRule
 import groovy.transform.TypeChecked
 import org.junit.Rule
+import pl.dariuszbacinski.stackoverflow.search.view.SearchActivity
 import spock.lang.Specification
 
 import static pl.dariuszbacinski.stackoverflow.search.SearchFeature.searchByQuestionName

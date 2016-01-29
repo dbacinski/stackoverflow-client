@@ -7,7 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import pl.dariuszbacinski.stackoverflow.search.SearchActivity;
+import pl.dariuszbacinski.stackoverflow.search.view.SearchActivity;
 
 import static junit.framework.Assert.assertTrue;
 

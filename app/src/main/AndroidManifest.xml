@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pl.dariuszbacinski.stackoverflow">
+<manifest
+    package="pl.dariuszbacinski.stackoverflow"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <application
-      android:icon="@mipmap/ic_launcher"
-      android:label="@string/app_name"
-      android:supportsRtl="true"
-      android:theme="@style/AppTheme">
-    <activity android:name=".search.SearchActivity">
-      <intent-filter>
-        <action android:name="android.intent.action.MAIN"/>
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".search.view.SearchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
 
-        <category android:name="android.intent.category.LAUNCHER"/>
-      </intent-filter>
-    </activity>
-  </application>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
 
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

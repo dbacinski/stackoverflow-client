@@ -1,4 +1,4 @@
-package pl.dariuszbacinski.stackoverflow.search;
+package pl.dariuszbacinski.stackoverflow.search.view;
 
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -13,15 +13,19 @@ import com.jakewharton.rxbinding.widget.RxSearchView;
 import hugo.weaving.DebugLog;
 import pl.dariuszbacinski.stackoverflow.R;
 import pl.dariuszbacinski.stackoverflow.databinding.ActivitySearchBinding;
+import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
+import pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionViewModel;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class SearchActivity extends AppCompatActivity {
 
     CompositeSubscription subscriptions;
+    QuestionViewModel questionViewModel = new QuestionViewModel(new QuestionService());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     void subscribeToSearchViewQueries(SearchView searchView) {
-        subscriptions.add(RxSearchView.queryTextChanges(searchView).throttleLast(300L, MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
+        subscriptions.add(RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
     }
 
     @DebugLog
@@ -57,8 +61,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public void call(CharSequence charSequence) {
-            //TODO pass call to model
-
+            questionViewModel.searchByTitle(charSequence.toString());
         }
     }
 }
