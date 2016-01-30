@@ -1,7 +1,5 @@
 package pl.dariuszbacinski.stackoverflow.search.model;
 
-import java.util.List;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import pl.dariuszbacinski.stackoverflow.BuildConfig;
@@ -40,14 +38,14 @@ public class QuestionService {
         this.questionApiService = questionApiService;
     }
 
-    public Observable<List<Question>> searchByTitle(final String query, Sort sort, Order order) {
+    public Observable<Question> searchByTitle(final String query, Sort sort, Order order) {
         validateQuery(query);
         return questionApiService.searchByTitle(query, sort, order).flatMap(new Func1<ResponseContainer<Question>, Observable<Question>>() {
             @Override
             public Observable<Question> call(ResponseContainer<Question> questionResponseContainer) {
                 return from(questionResponseContainer.items);
             }
-        }).toList().subscribeOn(Schedulers.io());
+        }).subscribeOn(Schedulers.io());
     }
 
     private void validateQuery(String query) {

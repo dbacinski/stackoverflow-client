@@ -19,19 +19,21 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class SearchActivity extends AppCompatActivity {
 
     CompositeSubscription subscriptions;
     QuestionViewModel questionViewModel = new QuestionViewModel(new QuestionService());
+    ActivitySearchBinding searchBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         subscriptions = new CompositeSubscription();
-        ActivitySearchBinding searchBinding = ActivitySearchBinding.inflate(getLayoutInflater());
+        searchBinding = ActivitySearchBinding.inflate(getLayoutInflater());
+        searchBinding.setViewModel(questionViewModel);
+        searchBinding.executePendingBindings();
         setContentView(searchBinding.getRoot());
     }
 

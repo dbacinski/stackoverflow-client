@@ -4,16 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import lombok.Data;
 
-
 @Data
 public class Question {
 
     @SerializedName("title")
     String title;
     @SerializedName("answer_count")
-    String answerCount;
+    int answerCount;
     @SerializedName("is_answered")
-    String isAnswered;
+    boolean isAnswered;
     @SerializedName("link")
     String link;
     @SerializedName("owner")
