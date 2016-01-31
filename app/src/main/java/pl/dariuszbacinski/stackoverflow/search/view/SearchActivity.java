@@ -6,7 +6,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.SearchView;
 
 import com.jakewharton.rxbinding.widget.RxSearchView;
@@ -14,7 +16,9 @@ import com.jakewharton.rxbinding.widget.RxSearchView;
 import hugo.weaving.DebugLog;
 import pl.dariuszbacinski.stackoverflow.R;
 import pl.dariuszbacinski.stackoverflow.databinding.ActivitySearchBinding;
+import pl.dariuszbacinski.stackoverflow.search.model.Order;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
+import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionViewModel;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -36,8 +40,14 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         searchBinding.setViewModel(questionViewModel);
         searchBinding.executePendingBindings();
         searchBinding.questionsRefresh.setOnRefreshListener(this);
+        setupFilters();
         setSupportActionBar(searchBinding.toolbar);
         setContentView(searchBinding.getRoot());
+    }
+
+    private void setupFilters() {
+        searchBinding.filterSort.setOnItemSelectedListener(new SortSelectedListener(questionViewModel));
+        searchBinding.filterOrder.setOnItemSelectedListener(new OrderSelectedListener(questionViewModel));
     }
 
     @Override
@@ -72,6 +82,46 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         @Override
         public void call(CharSequence charSequence) {
             subscriptions.add(questionViewModel.searchByTitle(charSequence.toString()));
+        }
+    }
+
+    static class SortSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        QuestionViewModel questionViewModel;
+
+        public SortSelectedListener(QuestionViewModel questionViewModel) {
+            this.questionViewModel = questionViewModel;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            String sort = (String) adapterView.getItemAtPosition(position);
+            questionViewModel.changeSort(Sort.fromString(sort));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            questionViewModel.changeSort(Sort.ACTIVITY);
+        }
+    }
+
+    static class OrderSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        QuestionViewModel questionViewModel;
+
+        public OrderSelectedListener(QuestionViewModel questionViewModel) {
+            this.questionViewModel = questionViewModel;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            String order = (String) adapterView.getItemAtPosition(position);
+            questionViewModel.changeOrder(Order.fromString(order));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            questionViewModel.changeOrder(Order.ASCENDING);
         }
     }
 }

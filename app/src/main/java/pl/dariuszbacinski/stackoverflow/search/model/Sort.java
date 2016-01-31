@@ -17,4 +17,15 @@ public enum Sort {
     public String toString() {
         return code;
     }
+
+    public static Sort fromString(String sortString) {
+        if (sortString != null) {
+            for (Sort sort : Sort.values()) {
+                if (sortString.equalsIgnoreCase(sort.code)) {
+                    return sort;
+                }
+            }
+        }
+        return ACTIVITY;
+    }
 }

@@ -27,7 +27,6 @@ import static pl.dariuszbacinski.stackoverflow.search.model.Sort.ACTIVITY;
 public class QuestionViewModel {
 
     final QuestionService questionService;
-
     final ObservableList<QuestionItemViewModel> questions = new ObservableArrayList<>();
     final ItemView itemView = ItemView.of(BR.itemViewModel, R.layout.list_item_question);
     final ObservableBoolean loading = new ObservableBoolean(false);
