@@ -1,11 +1,9 @@
 package pl.dariuszbacinski.stackoverflow.search.viewmodel
 
 import org.robospock.RoboSpecification
-import pl.dariuszbacinski.stackoverflow.search.model.Order
-import pl.dariuszbacinski.stackoverflow.search.model.Question
-import pl.dariuszbacinski.stackoverflow.search.model.QuestionService
-import pl.dariuszbacinski.stackoverflow.search.model.Sort
+import pl.dariuszbacinski.stackoverflow.search.model.*
 import rx.Observable
+import rx.observers.TestSubscriber
 
 class QuestionViewModelSpec extends RoboSpecification {
 
@@ -32,7 +30,7 @@ class QuestionViewModelSpec extends RoboSpecification {
     def "clear questions list for empty query"() {
         given:
             QuestionViewModel objectUnderTest = [questionServiceMock]
-            objectUnderTest.questions.add(new Question())
+            objectUnderTest.questions.add(new QuestionItemViewModel())
         when:
             objectUnderTest.searchByTitle("")
         then:
@@ -42,11 +40,16 @@ class QuestionViewModelSpec extends RoboSpecification {
     def "update questions for valid query"() {
         given:
             QuestionViewModel objectUnderTest = [questionServiceMock]
-            Question expectedQuestion = new Question()
-            questionServiceMock.searchByTitle(_ as String, _ as Sort, _ as Order) >> Observable.just([expectedQuestion])
+            Question question = new Question()
+            question.owner = new Owner()
+            question.owner.displayName = "John"
+            questionServiceMock.searchByTitle(_ as String, _ as Sort, _ as Order) >> Observable.just(question)
+            TestSubscriber<List<QuestionItemViewModel>> subscriber = new TestSubscriber<>()
         when:
-            objectUnderTest.searchByTitle("test")
+            objectUnderTest.reloadQuestionsObservable("any", Sort.ACTIVITY, Order.ASCENDING).subscribe(subscriber)
         then:
-            objectUnderTest.questions.contains(expectedQuestion)
+            subscriber.awaitTerminalEvent()
+            subscriber.assertNoErrors()
+            subscriber.getOnNextEvents().first().first().ownerName == "John"
     }
 }

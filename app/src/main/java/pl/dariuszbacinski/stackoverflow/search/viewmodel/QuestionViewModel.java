@@ -3,6 +3,7 @@ package pl.dariuszbacinski.stackoverflow.search.viewmodel;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
+import java.util.Collections;
 import java.util.List;
 
 import hugo.weaving.DebugLog;
@@ -13,11 +14,11 @@ import pl.dariuszbacinski.stackoverflow.search.model.Order;
 import pl.dariuszbacinski.stackoverflow.search.model.Question;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
 import pl.dariuszbacinski.stackoverflow.search.model.Sort;
+import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.subscriptions.Subscriptions;
 
 import static pl.dariuszbacinski.stackoverflow.search.model.Order.ASCENDING;
 import static pl.dariuszbacinski.stackoverflow.search.model.Sort.ACTIVITY;
@@ -37,31 +38,29 @@ public class QuestionViewModel {
 
     public Subscription searchByTitle(String query) {
         this.query = query;
-        return reloadQuestions(query, order, sort);
+        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
     }
 
     //TODO create UI
     public Subscription changeOrder(Order order) {
         this.order = order;
-        return reloadQuestions(query, order, sort);
+        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
     }
 
     //TODO create UI
     public Subscription changeSort(Sort sort) {
         this.sort = sort;
-        return reloadQuestions(query, order, sort);
+        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
     }
 
-    private Subscription reloadQuestions(String query, Order order, Sort sort) {
+    Observable<List<QuestionItemViewModel>> reloadQuestionsObservable(String query, Sort sort, Order order) {
         if (query != null && !query.isEmpty()) {
             return questionService.searchByTitle(query, sort, order)
                     .map(new MapQuestionToViewModel())
                     .toList()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new QuestionSubscriber(questions));
+                    .observeOn(AndroidSchedulers.mainThread());
         } else {
-            questions.clear();
-            return Subscriptions.empty();
+            return Observable.just(Collections.<QuestionItemViewModel>emptyList());
         }
     }
 

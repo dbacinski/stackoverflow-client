@@ -12,7 +12,7 @@ import static pl.dariuszbacinski.stackoverflow.search.SearchFeature.searchByQues
 public class SearchSpec extends Specification {
 
     @Rule
-    ActivityTestRule<SearchActivity> searchActivityActivityTestRule = new ActivityTestRule(SearchActivity)
+    ActivityTestRule<SearchActivity> searchActivityActivityTestRule = new ActivityTestRule<>(SearchActivity)
 
     def 'search by question name'() {
         given:
