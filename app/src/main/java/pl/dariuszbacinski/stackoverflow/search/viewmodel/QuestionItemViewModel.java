@@ -27,9 +27,8 @@ public class QuestionItemViewModel extends BaseObservable {
     public void openDetails(View view) {
         //TODO send event to activity and then open details
         if (link != null && !link.isEmpty()) {
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(link));
-            view.getContext().startActivity(i);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            view.getContext().startActivity(intent);
         }
     }
 }
