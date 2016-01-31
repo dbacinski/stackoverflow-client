@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="itemViewModel"
+            type="pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionItemViewModel"/>
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:onClick="@{itemViewModel.openDetails}">
+
+        <ImageView
+            android:id="@+id/owner_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            app:src="@{itemViewModel.ownerImageUrl}"
+            tools:src="@drawable/ic_image_placeholder"/>
+
+        <TextView
+            android:id="@+id/question_answer_count"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="4dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:text="@{itemViewModel.answerCount}"
+            app:answered="@{itemViewModel.isAnswered}"
+            tools:background="#75845c"
+            tools:text="22"/>
+
+        <TextView
+            android:id="@+id/question_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/question_answer_count"
+            android:layout_toStartOf="@id/owner_image"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:lines="2"
+            android:text="@{itemViewModel.title}"
+            android:textStyle="bold"
+            tools:text="Proper use cases for Android UserManager isUserAGoat()?"/>
+
+        <TextView
+            android:id="@+id/owner_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/question_title"
+            android:layout_toStartOf="@id/owner_image"
+            android:layout_marginEnd="8dp"
+            android:gravity="end"
+            android:text="@{itemViewModel.ownerName}"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            tools:text="Ovidiu Latcu"/>
+    </RelativeLayout>
+</layout>

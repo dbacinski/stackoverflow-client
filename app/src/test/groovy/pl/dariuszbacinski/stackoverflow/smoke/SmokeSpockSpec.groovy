@@ -1,4 +1,4 @@
-package pl.dariuszbacinski.stackoverflow
+package pl.dariuszbacinski.stackoverflow.smoke
 
 import spock.lang.Specification
 
