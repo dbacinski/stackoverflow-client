@@ -31,9 +31,8 @@ public class QuestionViewModel {
     final ObservableList<QuestionItemViewModel> questions = new ObservableArrayList<>();
     final ItemView itemView = ItemView.of(BR.itemViewModel, R.layout.list_item_question);
     final ObservableBoolean loading = new ObservableBoolean(false);
-
-    Order order = ASCENDING;
-    Sort sort = ACTIVITY;
+    OrderViewModel order = new OrderViewModel(ASCENDING);
+    SortViewModel sort = new SortViewModel(ACTIVITY);
     String query = "";
 
     public QuestionViewModel(QuestionService questionService) {
@@ -47,18 +46,18 @@ public class QuestionViewModel {
 
     //TODO create UI
     public Subscription changeOrder(Order order) {
-        this.order = order;
+        this.order.setOrder(order);
         return searchWithStoredParameters();
     }
 
     //TODO create UI
     public Subscription changeSort(Sort sort) {
-        this.sort = sort;
+        this.sort.setSort(sort);
         return searchWithStoredParameters();
     }
 
     public Subscription searchWithStoredParameters() {
-        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions, loading));
+        return reloadQuestionsObservable(query, sort.getSort(), order.getOrder()).subscribe(new QuestionSubscriber(questions, loading));
     }
 
     Observable<List<QuestionItemViewModel>> reloadQuestionsObservable(String query, Sort sort, Order order) {
@@ -83,6 +82,14 @@ public class QuestionViewModel {
 
     public ObservableBoolean getLoading() {
         return loading;
+    }
+
+    public OrderViewModel getOrder() {
+        return order;
+    }
+
+    public SortViewModel getSort() {
+        return sort;
     }
 
     static class MapQuestionToViewModel implements Func1<Question, QuestionItemViewModel> {
@@ -124,7 +131,6 @@ public class QuestionViewModel {
 
         @Override
         public void onNext(List<QuestionItemViewModel> newQuestions) {
-
             questions.clear();
             questions.addAll(newQuestions);
         }

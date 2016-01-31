@@ -15,31 +15,62 @@
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
-
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/questions_refresh"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:loading="@{viewModel.loading}">
+            android:orientation="vertical">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/questions_list"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                app:logo="@drawable/ic_logo"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+            <LinearLayout
+                android:id="@+id/filters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin">
+
+                <fr.ganfra.materialspinner.MaterialSpinner
+                    android:id="@+id/filter_sort"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:filterValues="@{viewModel.sort}"/>
+
+                <fr.ganfra.materialspinner.MaterialSpinner
+                    android:id="@+id/filter_order"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    app:filterValues="@{viewModel.order}"/>
+            </LinearLayout>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/questions_refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:itemView="@{viewModel.itemView}"
-                app:items="@{viewModel.questions}"
-                app:layoutManager="@{LayoutManagers.linear()}"
-                tools:listitem="@layout/list_item_question"/>
-        </android.support.v4.widget.SwipeRefreshLayout>
+                app:loading="@{viewModel.loading}">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/questions_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    android:paddingStart="@dimen/activity_horizontal_margin"
+                    app:itemView="@{viewModel.itemView}"
+                    app:items="@{viewModel.questions}"
+                    app:layoutManager="@{LayoutManagers.linear()}"
+                    tools:listitem="@layout/list_item_question"/>
+            </android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
 </layout>

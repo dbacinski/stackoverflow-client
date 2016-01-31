@@ -1,4 +1,6 @@
 <resources>
   <string name="app_name">Stackoverflow Client</string>
   <string name="search_questions">Search StackOverflow</string>
+  <string name="order">Order</string>
+  <string name="sort">Sort</string>
 </resources>

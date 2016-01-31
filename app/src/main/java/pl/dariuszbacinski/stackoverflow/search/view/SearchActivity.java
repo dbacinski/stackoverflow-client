@@ -35,8 +35,9 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         searchBinding = ActivitySearchBinding.inflate(getLayoutInflater());
         searchBinding.setViewModel(questionViewModel);
         searchBinding.executePendingBindings();
-        setContentView(searchBinding.getRoot());
         searchBinding.questionsRefresh.setOnRefreshListener(this);
+        setSupportActionBar(searchBinding.toolbar);
+        setContentView(searchBinding.getRoot());
     }
 
     @Override

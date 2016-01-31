@@ -52,6 +52,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding-support-v4:0.3.0'
     compile 'me.tatarka.bindingcollectionadapter:bindingcollectionadapter-recyclerview:1.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.ganfra:material-spinner:1.1.1'
     provided 'org.projectlombok:lombok:1.16.6'
 
     testCompile 'org.robospock:robospock:1.0.0'
