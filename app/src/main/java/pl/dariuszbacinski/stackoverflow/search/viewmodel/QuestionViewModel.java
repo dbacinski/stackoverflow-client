@@ -1,6 +1,7 @@
 package pl.dariuszbacinski.stackoverflow.search.viewmodel;
 
 import android.databinding.ObservableArrayList;
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableList;
 
 import java.util.Collections;
@@ -26,8 +27,11 @@ import static pl.dariuszbacinski.stackoverflow.search.model.Sort.ACTIVITY;
 public class QuestionViewModel {
 
     final QuestionService questionService;
+
     final ObservableList<QuestionItemViewModel> questions = new ObservableArrayList<>();
     final ItemView itemView = ItemView.of(BR.itemViewModel, R.layout.list_item_question);
+    final ObservableBoolean loading = new ObservableBoolean(false);
+
     Order order = ASCENDING;
     Sort sort = ACTIVITY;
     String query = "";
@@ -38,22 +42,27 @@ public class QuestionViewModel {
 
     public Subscription searchByTitle(String query) {
         this.query = query;
-        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
+        return searchWithStoredParameters();
     }
 
     //TODO create UI
     public Subscription changeOrder(Order order) {
         this.order = order;
-        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
+        return searchWithStoredParameters();
     }
 
     //TODO create UI
     public Subscription changeSort(Sort sort) {
         this.sort = sort;
-        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions));
+        return searchWithStoredParameters();
+    }
+
+    public Subscription searchWithStoredParameters() {
+        return reloadQuestionsObservable(query, sort, order).subscribe(new QuestionSubscriber(questions, loading));
     }
 
     Observable<List<QuestionItemViewModel>> reloadQuestionsObservable(String query, Sort sort, Order order) {
+        loading.set(true);
         if (query != null && !query.isEmpty()) {
             return questionService.searchByTitle(query, sort, order)
                     .map(new MapQuestionToViewModel())
@@ -72,30 +81,8 @@ public class QuestionViewModel {
         return itemView;
     }
 
-    @DebugLog
-    static class QuestionSubscriber extends Subscriber<List<QuestionItemViewModel>> {
-
-        ObservableList<QuestionItemViewModel> questions;
-
-        public QuestionSubscriber(ObservableList<QuestionItemViewModel> questions) {
-            this.questions = questions;
-        }
-
-        @Override
-        public void onCompleted() {
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            //TODO show error on UI
-            questions.clear();
-        }
-
-        @Override
-        public void onNext(List<QuestionItemViewModel> newQuestions) {
-            questions.clear();
-            questions.addAll(newQuestions);
-        }
+    public ObservableBoolean getLoading() {
+        return loading;
     }
 
     static class MapQuestionToViewModel implements Func1<Question, QuestionItemViewModel> {
@@ -109,6 +96,37 @@ public class QuestionViewModel {
             itemViewModel.isAnswered = question.isAnswered();
             itemViewModel.link = question.getLink();
             return itemViewModel;
+        }
+    }
+
+    @DebugLog
+    static class QuestionSubscriber extends Subscriber<List<QuestionItemViewModel>> {
+
+        ObservableList<QuestionItemViewModel> questions;
+        ObservableBoolean loading;
+
+        public QuestionSubscriber(ObservableList<QuestionItemViewModel> questions, ObservableBoolean loading) {
+            this.questions = questions;
+            this.loading = loading;
+        }
+
+        @Override
+        public void onCompleted() {
+            loading.set(false);
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            //TODO show error on UI
+            loading.set(false);
+            questions.clear();
+        }
+
+        @Override
+        public void onNext(List<QuestionItemViewModel> newQuestions) {
+
+            questions.clear();
+            questions.addAll(newQuestions);
         }
     }
 }

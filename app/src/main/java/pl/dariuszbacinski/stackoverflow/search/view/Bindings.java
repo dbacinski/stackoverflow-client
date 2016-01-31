@@ -3,6 +3,7 @@ package pl.dariuszbacinski.stackoverflow.search.view;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -27,6 +28,11 @@ public class Bindings {
         int answeredColor = ContextCompat.getColor(context, R.color.answeredQuestion);
         int notAnsweredQuestion = ContextCompat.getColor(context, R.color.notAnsweredQuestion);
         view.setBackgroundColor(isAnswered ? answeredColor : notAnsweredQuestion);
+    }
+
+    @BindingAdapter("app:loading")
+    public static void setBackgroundColor(SwipeRefreshLayout swipeRefreshLayout, boolean isAnswered) {
+        swipeRefreshLayout.setRefreshing(isAnswered);
     }
 
     private static boolean isNotEmpty(String url) {
