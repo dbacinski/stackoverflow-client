@@ -26,14 +26,20 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/questions_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/questions_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:itemView="@{viewModel.itemView}"
-            app:items="@{viewModel.questions}"
-            app:layoutManager="@{LayoutManagers.linear()}"
-            tools:listitem="@layout/list_item_question"/>
+            app:loading="@{viewModel.loading}">
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/questions_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:itemView="@{viewModel.itemView}"
+                app:items="@{viewModel.questions}"
+                app:layoutManager="@{LayoutManagers.linear()}"
+                tools:listitem="@layout/list_item_question"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
     </android.support.design.widget.CoordinatorLayout>
 </layout>

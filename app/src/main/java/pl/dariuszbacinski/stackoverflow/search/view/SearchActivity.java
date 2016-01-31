@@ -2,6 +2,7 @@ package pl.dariuszbacinski.stackoverflow.search.view;
 
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +22,7 @@ import rx.subscriptions.CompositeSubscription;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     CompositeSubscription subscriptions;
     QuestionViewModel questionViewModel = new QuestionViewModel(new QuestionService());
@@ -35,6 +36,7 @@ public class SearchActivity extends AppCompatActivity {
         searchBinding.setViewModel(questionViewModel);
         searchBinding.executePendingBindings();
         setContentView(searchBinding.getRoot());
+        searchBinding.questionsRefresh.setOnRefreshListener(this);
     }
 
     @Override
@@ -58,12 +60,17 @@ public class SearchActivity extends AppCompatActivity {
         subscriptions.add(RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
     }
 
+    @Override
+    public void onRefresh() {
+        subscriptions.add(questionViewModel.searchWithStoredParameters());
+    }
+
     @DebugLog
     class RequestQuestions implements Action1<CharSequence> {
 
         @Override
         public void call(CharSequence charSequence) {
-            questionViewModel.searchByTitle(charSequence.toString());
+            subscriptions.add(questionViewModel.searchByTitle(charSequence.toString()));
         }
     }
 }
