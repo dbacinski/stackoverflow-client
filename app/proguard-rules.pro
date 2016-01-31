@@ -1,3 +1,5 @@
+-dontobfuscate
+-optimizationpasses 5
 #RxJava:
 -dontwarn sun.misc.Unsafe
 -dontwarn okio.**
