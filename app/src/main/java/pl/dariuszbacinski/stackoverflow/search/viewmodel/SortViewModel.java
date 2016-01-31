@@ -7,13 +7,17 @@ import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import rx.Observable;
 import rx.functions.Func1;
 
-public class SortViewModel implements FilterDisplay{
+public class SortViewModel implements FilterDisplay {
 
-    Sort sort;
+    private Sort sort;
     List<String> values;
 
     public SortViewModel(Sort sort) {
+        this();
         this.sort = sort;
+    }
+
+    public SortViewModel() {
         this.values = Observable.from(Sort.values()).map(new Func1<Sort, String>() {
             @Override
             public String call(Sort order) {

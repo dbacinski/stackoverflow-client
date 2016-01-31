@@ -17,6 +17,7 @@ import hugo.weaving.DebugLog;
 import pl.dariuszbacinski.stackoverflow.R;
 import pl.dariuszbacinski.stackoverflow.databinding.ActivitySearchBinding;
 import pl.dariuszbacinski.stackoverflow.search.model.Order;
+import pl.dariuszbacinski.stackoverflow.search.model.QuestionFiltersStorage;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
 import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionViewModel;
@@ -28,8 +29,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class SearchActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+    private static final String KEY_QUERY = "query";
+    private static final String KEY_ORDER = "order";
+    private static final String KEY_SORT = "sort";
     CompositeSubscription subscriptions;
-    QuestionViewModel questionViewModel = new QuestionViewModel(new QuestionService());
+    QuestionViewModel questionViewModel;
     ActivitySearchBinding searchBinding;
 
     @Override
@@ -37,12 +41,35 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         super.onCreate(savedInstanceState);
         subscriptions = new CompositeSubscription();
         searchBinding = ActivitySearchBinding.inflate(getLayoutInflater());
+        questionViewModel = new QuestionViewModel(new QuestionService());
+        questionViewModel.restoreState(getQueryFilterStorage(savedInstanceState));
         searchBinding.setViewModel(questionViewModel);
         searchBinding.executePendingBindings();
         searchBinding.questionsRefresh.setOnRefreshListener(this);
         setupFilters();
         setSupportActionBar(searchBinding.toolbar);
         setContentView(searchBinding.getRoot());
+    }
+
+    private QuestionFiltersStorage getQueryFilterStorage(Bundle savedInstanceState) {
+        QuestionFiltersStorage questionFiltersStorage = new QuestionFiltersStorage();
+
+        if (savedInstanceState != null) {
+            questionFiltersStorage.setQuery(savedInstanceState.getString(KEY_QUERY));
+            questionFiltersStorage.setSort(savedInstanceState.getString(KEY_SORT));
+            questionFiltersStorage.setOrder(savedInstanceState.getString(KEY_ORDER));
+        }
+
+        return questionFiltersStorage;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        QuestionFiltersStorage questionFiltersStorage = questionViewModel.saveState();
+        savedInstanceState.putString(KEY_QUERY, questionFiltersStorage.getQuery());
+        savedInstanceState.putString(KEY_SORT, questionFiltersStorage.getSort());
+        savedInstanceState.putString(KEY_ORDER, questionFiltersStorage.getOrder());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     private void setupFilters() {
@@ -68,7 +95,7 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     }
 
     void subscribeToSearchViewQueries(SearchView searchView) {
-        subscriptions.add(RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
+        subscriptions.add(RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).skip(1).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
     }
 
     @Override

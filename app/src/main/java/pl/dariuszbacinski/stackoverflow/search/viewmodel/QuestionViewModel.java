@@ -1,5 +1,6 @@
 package pl.dariuszbacinski.stackoverflow.search.viewmodel;
 
+import android.databinding.BaseObservable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableList;
@@ -13,6 +14,7 @@ import pl.dariuszbacinski.stackoverflow.BR;
 import pl.dariuszbacinski.stackoverflow.R;
 import pl.dariuszbacinski.stackoverflow.search.model.Order;
 import pl.dariuszbacinski.stackoverflow.search.model.Question;
+import pl.dariuszbacinski.stackoverflow.search.model.QuestionFiltersStorage;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
 import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import rx.Observable;
@@ -24,7 +26,7 @@ import rx.functions.Func1;
 import static pl.dariuszbacinski.stackoverflow.search.model.Order.ASCENDING;
 import static pl.dariuszbacinski.stackoverflow.search.model.Sort.ACTIVITY;
 
-public class QuestionViewModel {
+public class QuestionViewModel extends BaseObservable{
 
     final QuestionService questionService;
     final ObservableList<QuestionItemViewModel> questions = new ObservableArrayList<>();
@@ -43,13 +45,11 @@ public class QuestionViewModel {
         return searchWithStoredParameters();
     }
 
-    //TODO create UI
     public Subscription changeOrder(Order order) {
         this.order.setOrder(order);
         return searchWithStoredParameters();
     }
 
-    //TODO create UI
     public Subscription changeSort(Sort sort) {
         this.sort.setSort(sort);
         return searchWithStoredParameters();
@@ -57,6 +57,21 @@ public class QuestionViewModel {
 
     public Subscription searchWithStoredParameters() {
         return reloadQuestionsObservable(query, sort.getSort(), order.getOrder()).subscribe(new QuestionSubscriber(questions, loading));
+    }
+
+    public QuestionFiltersStorage saveState() {
+        QuestionFiltersStorage questionFiltersStorage = new QuestionFiltersStorage();
+        questionFiltersStorage.setQuery(query);
+        questionFiltersStorage.setSort(sort.getSort().toString());
+        questionFiltersStorage.setOrder(order.getOrder().toString());
+        return questionFiltersStorage;
+    }
+
+    public void restoreState(QuestionFiltersStorage questionFiltersStorage) {
+        query = questionFiltersStorage.getQuery();
+        order.setOrder(Order.fromString(questionFiltersStorage.getOrder()));
+        sort.setSort(Sort.fromString(questionFiltersStorage.getSort()));
+        searchWithStoredParameters();
     }
 
     Observable<List<QuestionItemViewModel>> reloadQuestionsObservable(String query, Sort sort, Order order) {

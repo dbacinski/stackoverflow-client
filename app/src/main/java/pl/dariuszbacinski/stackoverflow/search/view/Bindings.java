@@ -45,7 +45,7 @@ public class Bindings {
         spinner.setAdapter(adapter);
         spinner.setFloatingLabelText(filterDisplay.filterNameRes());
         spinner.setHint(filterDisplay.filterNameRes());
-        spinner.setSelection(1);
+        spinner.setSelection(adapter.getPosition(filterDisplay.filterSelected()) + 1);
     }
 
     private static boolean isNotEmpty(String url) {

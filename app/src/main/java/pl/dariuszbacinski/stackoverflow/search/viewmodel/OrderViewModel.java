@@ -9,17 +9,21 @@ import rx.functions.Func1;
 
 public class OrderViewModel implements FilterDisplay{
 
-    Order order;
+    private Order order;
     List<String> values;
 
-    public OrderViewModel(Order order) {
-        this.order = order;
+    public OrderViewModel() {
         this.values = Observable.from(Order.values()).map(new Func1<Order, String>() {
             @Override
             public String call(Order order) {
                 return order.toString();
             }
         }).toList().toBlocking().single();
+    }
+
+    public OrderViewModel(Order order) {
+        this();
+        this.order = order;
     }
 
     @Override
