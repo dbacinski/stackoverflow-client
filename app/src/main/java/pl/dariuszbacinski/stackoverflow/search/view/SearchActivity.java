@@ -6,9 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.SearchView;
 
 import com.jakewharton.rxbinding.widget.RxSearchView;
@@ -16,10 +14,8 @@ import com.jakewharton.rxbinding.widget.RxSearchView;
 import hugo.weaving.DebugLog;
 import pl.dariuszbacinski.stackoverflow.R;
 import pl.dariuszbacinski.stackoverflow.databinding.ActivitySearchBinding;
-import pl.dariuszbacinski.stackoverflow.search.model.Order;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionFiltersStorage;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
-import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionViewModel;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,7 +29,7 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     private static final String KEY_QUERY = "query";
     private static final String KEY_ORDER = "order";
     private static final String KEY_SORT = "sort";
-    Subscription networkSubscription= Subscriptions.empty();
+    Subscription networkSubscription = Subscriptions.empty();
     Subscription inputSubscription = Subscriptions.empty();
     QuestionViewModel questionViewModel;
     ActivitySearchBinding searchBinding;
@@ -47,7 +43,6 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         searchBinding.setViewModel(questionViewModel);
         searchBinding.executePendingBindings();
         searchBinding.questionsRefresh.setOnRefreshListener(this);
-        setupFilters();
         setSupportActionBar(searchBinding.toolbar);
         setContentView(searchBinding.getRoot());
     }
@@ -71,11 +66,6 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         savedInstanceState.putString(KEY_SORT, questionFiltersStorage.getSort());
         savedInstanceState.putString(KEY_ORDER, questionFiltersStorage.getOrder());
         super.onSaveInstanceState(savedInstanceState);
-    }
-
-    private void setupFilters() {
-        searchBinding.filterSort.setOnItemSelectedListener(new SortSelectedListener());
-        searchBinding.filterOrder.setOnItemSelectedListener(new OrderSelectedListener());
     }
 
     @Override
@@ -104,7 +94,8 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     public void onRefresh() {
         setNetworkSubscription(questionViewModel.searchWithStoredParameters());
     }
-@DebugLog
+
+    @DebugLog
     void setNetworkSubscription(Subscription subscription) {
         this.networkSubscription.unsubscribe();
         this.networkSubscription = subscription;
@@ -116,34 +107,6 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         @Override
         public void call(CharSequence charSequence) {
             setNetworkSubscription(questionViewModel.searchByTitle(charSequence.toString()));
-        }
-    }
-
-    class SortSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-            String sort = (String) adapterView.getItemAtPosition(position);
-            setNetworkSubscription(questionViewModel.changeSort(Sort.fromString(sort)));
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-            questionViewModel.changeSort(Sort.ACTIVITY);
-        }
-    }
-
-    class OrderSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-            String order = (String) adapterView.getItemAtPosition(position);
-            setNetworkSubscription(questionViewModel.changeOrder(Order.fromString(order)));
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-            setNetworkSubscription(questionViewModel.changeOrder(Order.ASCENDING));
         }
     }
 }

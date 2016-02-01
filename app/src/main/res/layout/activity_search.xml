@@ -43,7 +43,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:filterValues="@{viewModel.sort}"/>
+                    app:filterValues="@{viewModel.sort}"
+                    app:onFilterSelected="@{viewModel.sortSelectedListener}"/>
 
                 <fr.ganfra.materialspinner.MaterialSpinner
                     android:id="@+id/filter_order"
@@ -51,7 +52,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_weight="1"
-                    app:filterValues="@{viewModel.order}"/>
+                    app:filterValues="@{viewModel.order}"
+                    app:onFilterSelected="@{viewModel.orderSelectedListener}"/>
             </LinearLayout>
 
             <android.support.v4.widget.SwipeRefreshLayout

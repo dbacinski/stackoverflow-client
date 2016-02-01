@@ -4,6 +4,8 @@ import android.databinding.BaseObservable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableList;
+import android.view.View;
+import android.widget.AdapterView;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,8 @@ public class QuestionViewModel extends BaseObservable {
     OrderViewModel order = new OrderViewModel(ASCENDING);
     SortViewModel sort = new SortViewModel(ACTIVITY);
     String query = "";
+    final SortSelectedListener sortSelectedListener = new SortSelectedListener();
+    final OrderSelectedListener orderSelectedListener = new OrderSelectedListener();
 
     public QuestionViewModel(QuestionService questionService) {
         this.questionService = questionService;
@@ -115,6 +119,14 @@ public class QuestionViewModel extends BaseObservable {
         return sort;
     }
 
+    public SortSelectedListener getSortSelectedListener() {
+        return sortSelectedListener;
+    }
+
+    public OrderSelectedListener getOrderSelectedListener() {
+        return orderSelectedListener;
+    }
+
     static class MapQuestionToViewModel implements Func1<Question, QuestionItemViewModel> {
         @Override
         public QuestionItemViewModel call(Question question) {
@@ -156,6 +168,34 @@ public class QuestionViewModel extends BaseObservable {
         public void onNext(List<QuestionItemViewModel> newQuestions) {
             questions.clear();
             questions.addAll(newQuestions);
+        }
+    }
+
+    public class SortSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            String sort = (String) adapterView.getItemAtPosition(position);
+            changeSort(Sort.fromString(sort));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            changeSort(Sort.ACTIVITY);
+        }
+    }
+
+    public class OrderSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+            String order = (String) adapterView.getItemAtPosition(position);
+            changeOrder(Order.fromString(order));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
+            changeOrder(Order.ASCENDING);
         }
     }
 }
