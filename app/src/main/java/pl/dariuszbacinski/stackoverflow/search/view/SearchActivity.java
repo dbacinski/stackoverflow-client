@@ -21,9 +21,10 @@ import pl.dariuszbacinski.stackoverflow.search.model.QuestionFiltersStorage;
 import pl.dariuszbacinski.stackoverflow.search.model.QuestionService;
 import pl.dariuszbacinski.stackoverflow.search.model.Sort;
 import pl.dariuszbacinski.stackoverflow.search.viewmodel.QuestionViewModel;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -32,14 +33,14 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     private static final String KEY_QUERY = "query";
     private static final String KEY_ORDER = "order";
     private static final String KEY_SORT = "sort";
-    CompositeSubscription subscriptions;
+    Subscription networkSubscription= Subscriptions.empty();
+    Subscription inputSubscription = Subscriptions.empty();
     QuestionViewModel questionViewModel;
     ActivitySearchBinding searchBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        subscriptions = new CompositeSubscription();
         searchBinding = ActivitySearchBinding.inflate(getLayoutInflater());
         questionViewModel = new QuestionViewModel(new QuestionService());
         questionViewModel.restoreState(getQueryFilterStorage(savedInstanceState));
@@ -73,13 +74,14 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     }
 
     private void setupFilters() {
-        searchBinding.filterSort.setOnItemSelectedListener(new SortSelectedListener(questionViewModel));
-        searchBinding.filterOrder.setOnItemSelectedListener(new OrderSelectedListener(questionViewModel));
+        searchBinding.filterSort.setOnItemSelectedListener(new SortSelectedListener());
+        searchBinding.filterOrder.setOnItemSelectedListener(new OrderSelectedListener());
     }
 
     @Override
     protected void onDestroy() {
-        subscriptions.unsubscribe();
+        networkSubscription.unsubscribe();
+        inputSubscription.unsubscribe();
         super.onDestroy();
     }
 
@@ -95,12 +97,17 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
     }
 
     void subscribeToSearchViewQueries(SearchView searchView) {
-        subscriptions.add(RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).skip(1).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions()));
+        inputSubscription = RxSearchView.queryTextChanges(searchView).debounce(1L, SECONDS).skip(1).observeOn(AndroidSchedulers.mainThread()).subscribe(new RequestQuestions());
     }
 
     @Override
     public void onRefresh() {
-        subscriptions.add(questionViewModel.searchWithStoredParameters());
+        setNetworkSubscription(questionViewModel.searchWithStoredParameters());
+    }
+@DebugLog
+    void setNetworkSubscription(Subscription subscription) {
+        this.networkSubscription.unsubscribe();
+        this.networkSubscription = subscription;
     }
 
     @DebugLog
@@ -108,22 +115,16 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
 
         @Override
         public void call(CharSequence charSequence) {
-            subscriptions.add(questionViewModel.searchByTitle(charSequence.toString()));
+            setNetworkSubscription(questionViewModel.searchByTitle(charSequence.toString()));
         }
     }
 
-    static class SortSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        QuestionViewModel questionViewModel;
-
-        public SortSelectedListener(QuestionViewModel questionViewModel) {
-            this.questionViewModel = questionViewModel;
-        }
+    class SortSelectedListener implements AdapterView.OnItemSelectedListener {
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
             String sort = (String) adapterView.getItemAtPosition(position);
-            questionViewModel.changeSort(Sort.fromString(sort));
+            setNetworkSubscription(questionViewModel.changeSort(Sort.fromString(sort)));
         }
 
         @Override
@@ -132,23 +133,17 @@ public class SearchActivity extends AppCompatActivity implements SwipeRefreshLay
         }
     }
 
-    static class OrderSelectedListener implements AdapterView.OnItemSelectedListener {
-
-        QuestionViewModel questionViewModel;
-
-        public OrderSelectedListener(QuestionViewModel questionViewModel) {
-            this.questionViewModel = questionViewModel;
-        }
+    class OrderSelectedListener implements AdapterView.OnItemSelectedListener {
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
             String order = (String) adapterView.getItemAtPosition(position);
-            questionViewModel.changeOrder(Order.fromString(order));
+            setNetworkSubscription(questionViewModel.changeOrder(Order.fromString(order)));
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-            questionViewModel.changeOrder(Order.ASCENDING);
+            setNetworkSubscription(questionViewModel.changeOrder(Order.ASCENDING));
         }
     }
 }
