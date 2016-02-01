@@ -22,11 +22,12 @@ import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.subscriptions.Subscriptions;
 
 import static pl.dariuszbacinski.stackoverflow.search.model.Order.ASCENDING;
 import static pl.dariuszbacinski.stackoverflow.search.model.Sort.ACTIVITY;
 
-public class QuestionViewModel extends BaseObservable{
+public class QuestionViewModel extends BaseObservable {
 
     final QuestionService questionService;
     final ObservableList<QuestionItemViewModel> questions = new ObservableArrayList<>();
@@ -46,13 +47,21 @@ public class QuestionViewModel extends BaseObservable{
     }
 
     public Subscription changeOrder(Order order) {
-        this.order.setOrder(order);
-        return searchWithStoredParameters();
+        if (!this.order.getOrder().equals(order)) {
+            this.order.setOrder(order);
+            return searchWithStoredParameters();
+        } else {
+            return Subscriptions.empty();
+        }
     }
 
     public Subscription changeSort(Sort sort) {
-        this.sort.setSort(sort);
-        return searchWithStoredParameters();
+        if (!this.sort.getSort().equals(sort)) {
+            this.sort.setSort(sort);
+            return searchWithStoredParameters();
+        } else {
+            return Subscriptions.empty();
+        }
     }
 
     public Subscription searchWithStoredParameters() {
